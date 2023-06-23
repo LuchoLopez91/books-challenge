@@ -40,3 +40,4 @@ module.exports = (sequelize, dataTypes) => {
 
 
 //danielgon@mail.com/12345678 admin
+//jorgra@mail.com/12345678L user
