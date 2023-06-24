@@ -37,12 +37,25 @@ const mainController = {
       .catch((error) => console.log(error));
   },
   deleteBook: (req, res) => {
-    db.Book.destroy({
-      where: {
-          id: req.params.id
-      }
-  })
-    res.render('home');
+    db.Book.destroy({ 
+      where: { 
+        id: req.params.id 
+      }, 
+      include: [{ association: 'authors' }],
+      force: true 
+    })
+      .then((book) => {
+        db.Book.findAll({
+          include: [{ association: 'authors' }]
+        })
+          .then((books) => {
+            res.render('home', { 
+              book,
+              books 
+            });
+          })
+          .catch((error) => console.log(error));
+      }).catch((error) => console.log(error));
   },
   authors: (req, res) => {
     db.Author.findAll()
@@ -102,19 +115,26 @@ const mainController = {
       })
     },
     
-  edit: (req, res) => {
-    db.Book.findByPk(req.params.id, {
-      include: [{ association: 'authors' }]
-    })
-      .then((book) => {
-        res.render('editBook', { book });
-      })
-      .catch((error) => console.log(error));
-  },
-  processEdit: (req, res) => {
-    
-    res.render('home');
-  },
+    edit: async (req, res) => {
+      let book = await db.Book.findByPk(req.params.id, {
+        include: [{ association: "authors" }],
+      });
+      res.render("editBook", { book, session: req.session });
+    },
+    processEdit: async (req, res) => {
+      let bookToEdit = {
+        title: req.body.title,
+        description: req.body.description,
+        cover: req.body.cover,
+      };
+      await db.Book.update(bookToEdit, {
+        where: {
+          id: req.params.id,
+        },
+      });
+  
+      res.redirect("/");
+    },
   logout: (req,res) => {
     res.clearCookie("login")
     res.clearCookie("admin")

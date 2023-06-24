@@ -4,13 +4,14 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const loginMiddlewares = require ('./middlewares/loginMiddlewares')
 const app = express();
+const methodOverride = require('method-override')
 
 app.use(cookieParser())
 app.use(session({secret: 'secret'}))
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(loginMiddlewares)
-
+app.use(methodOverride('_method'));
 
 app.set('view engine', 'ejs');
 app.set('views', 'src/views');
