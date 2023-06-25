@@ -37,25 +37,17 @@ const mainController = {
       .catch((error) => console.log(error));
   },
   deleteBook: (req, res) => {
-    db.Book.destroy({ 
-      where: { 
-        id: req.params.id 
-      }, 
-      include: [{ association: 'authors' }],
-      force: true 
-    })
-      .then((book) => {
-        db.Book.findAll({
-          include: [{ association: 'authors' }]
-        })
-          .then((books) => {
-            res.render('home', { 
-              book,
-              books 
-            });
-          })
-          .catch((error) => console.log(error));
-      }).catch((error) => console.log(error));
+    // Implement delete book
+    let bookId = req.params.id;
+
+    db.Booksauthors.destroy({ where: { BookId: bookId }, force: true })
+      .then(() => {
+        db.Book.destroy({ where: { id: bookId } });
+      })
+      .then(() => {
+        return res.redirect("/");
+      })
+      .catch((error) => res.send(error));
   },
   authors: (req, res) => {
     db.Author.findAll()
